@@ -2,6 +2,9 @@
 .Rhistory
 .Rapp.history
 
+/data/raw/*csv
+/data/raw/*rds
+
 # Session Data files
 .RData
 .RDataTmp
@@ -47,3 +50,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+data/processed/offenses_2016+_cons_dpts.csv
+data/processed/offenses_2016+.csv
+data/processed/nibrs_offense_segments.csv

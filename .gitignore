@@ -3,6 +3,7 @@
 .Rapp.history
 
 /data/raw/*csv
+/data/processed/*csv
 /data/raw/*rds
 
 # Session Data files
@@ -53,3 +54,5 @@ rsconnect/
 data/processed/offenses_2016+_cons_dpts.csv
 data/processed/offenses_2016+.csv
 data/processed/nibrs_offense_segments.csv
+
+rds_raw/

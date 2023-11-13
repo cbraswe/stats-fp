@@ -1,0 +1,105 @@
+---
+title: Project
+author: Charlotte Braswell
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: true
+    theme: cosmo
+    highlight: espresso
+---
+
+# About Rmarkdown
+Rmarkdown allows `notebook` formatting similar to Jupyter Notebook in Python. It allows a combination of text and code cells. For VSCode, it required  Pandoc (https://github.com/jgm/pandoc/releases/tag/3.1.9) & several R packages. For code cells, the code is provided in the top cell and the output is provided in the next cell. As an example:
+```{r}
+a<-1
+a
+```
+
+# Stolen Firearms & Violent Crime
+This will look at stolen firearms versus violent crime.
+
+## Import Libraries
+```{r}
+library(boot)
+library(ggplot2)
+```
+
+## Read in Data/Preview Data
+```{r}
+df <- read.csv('../data/processed/final_data.csv')
+# all rows, certain columns
+df <- df[, c('state', 'year', 'month', 'stolen_firearms', 'perc_firearm_involv')] 
+head(df, n=2)
+```
+
+## Scatterplot 
+```{r}
+# Create a scatterplot
+scatterplot <- ggplot(data = df, aes(x = stolen_firearms, y = perc_firearm_involv)) +
+  geom_point() +
+  labs(title = "Stolen Firearms & Violent Crime",
+       x = "Stolen Firearms",
+       y = "Percentage of Firearm-Involved Violent Crime")
+print(scatterplot)
+```
+
+## Create a Histogram of Stolen Firearms
+```{r}
+histogram <- ggplot(data = df, aes(x = stolen_firearms)) +
+  geom_histogram(binwidth = 10, fill = "blue", color = "black") +
+  labs(title = "Stolen Firearms Histogram",
+       x = "Stolen Firearms",
+       y = "Frequency")
+
+# Display the histogram
+print(histogram)
+```
+
+## Create a Histogram of Percent Firearm
+```{r}
+histogram <- ggplot(data = df, aes(x = perc_firearm_involv)) +
+  geom_histogram(binwidth = .01, fill = "blue", color = "black") +
+  labs(title = "Percent Firearm Involved Violent Crime Histogram",
+       x = "Firearm Violent Crime",
+       y = "Frequency")
+
+# Display the histogram
+print(histogram)
+```
+
+## Create a Simple Linear Regression
+```{r}
+lm_model <- lm(perc_firearm_involv ~ stolen_firearms, data = df)
+summary(lm_model)
+```
+Technically, the p-value is significant. However, the intercept is so small it is almost irrelevant, and we are violating linearity & normality.
+
+## Create a bootstrapped Simple linear Regression
+```{r}
+boot_lm <- function(data, indices) {
+  sampled_data <- data[indices, ]
+  lm_model <- lm(perc_firearm_involv ~ stolen_firearms, data = sampled_data)
+  return(coef(lm_model))
+}
+
+set.seed(42) 
+boot_results <- boot(data = df, statistic = boot_lm, R = 10000)
+
+# Extract the bootstrap results
+ts <- boot.ci(boot_results, index=2) # index 1 intercept, index 2 is slope
+print(ts)
+```
+
+## Are they wrong?
+It could also be the case that (1) stolen firearms are able to be tracked to recovery, and (2) when tracked to recovery, it's the recovery of a violent crime involving the firearm. If they were to remove this source of firearms, it is possible that the number of available firearms over time would also decrease (i.e., the actual available firearms in the economy is too small). This is purely hypothetical. 
+
+## Are our assumptions met?
+Linearity:
+QQ-Plot:
+
+
+# Domestic Violence Incidents in April 2020 (COVID)
+This will look at domestic violence incidents in states with and without domestic violence laws in April 2020.
